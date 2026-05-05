@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  nix:
+    name: Flake check + build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v9
+
+      - name: Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v3
+
+      - name: nix flake check
+        run: nix flake check --print-build-logs
+
+      - name: Build fixOciImageHistory
+        run: nix build --print-build-logs .#fixOciImageHistory
