@@ -2,18 +2,21 @@
 {
   "name": "nix-utils",
 
-  "image": "mcr.microsoft.com/devcontainers/base:debian",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
 
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
       "configureZshAsDefaultShell": true
     },
-    "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers/features/nix:1": {
-      "multiUser": true,
-      "extraNixConfig": "experimental-features = nix-command flakes"
-    }
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
+
+  // Determinate's `--init none` install does not manage the daemon, and this
+  // image has no systemd, so start nix-daemon ourselves once the container is
+  // up. The non-root `vscode` user talks to it over the daemon socket.
+  "postStartCommand": "sudo sh -c 'pgrep -x nix-daemon >/dev/null 2>&1 || (nix-daemon >/tmp/nix-daemon.log 2>&1 &)'",
 
   "customizations": {
     "vscode": {
